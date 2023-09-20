@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using uanl_ss_lib_xml_local_api;
+using uanl_ss_main_ui.Entities;
 
 namespace uanl_ss_main_ui.ControlHelpers
 {
@@ -10,11 +13,18 @@ namespace uanl_ss_main_ui.ControlHelpers
     {
         public static string CreateFileDirectory(string path)
         {
-            using (StreamWriter writer = new StreamWriter(path))
+            if (!File.Exists(path))
             {
-                writer.Write(String.Empty);
+                XmlCrud<RepoConfiguration> repoConfig = new XmlCrud<RepoConfiguration>(path);
+
+                repoConfig.CreateFile();
+
+                return path;
             }
-            return path;
+            else
+            {
+                return path;
+            }
         }
     }
 }

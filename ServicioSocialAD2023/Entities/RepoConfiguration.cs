@@ -11,12 +11,14 @@ namespace uanl_ss_main_ui.Entities
     [Serializable]
     public class RepoConfiguration
     {
-        [XmlIgnore]
+        [XmlAttribute]
         public string filePath { get; set; }
         [XmlAttribute]
         public string RCName { get; set; }
         [XmlAttribute]
         public string RCType { get; set; }
+        [XmlAttribute]
+        public string RCEnv { get; set; }
         [XmlAttribute]
         public string RCHostServer { get; set; }
         [XmlAttribute]
@@ -26,12 +28,13 @@ namespace uanl_ss_main_ui.Entities
         [XmlAttribute]
         public string RCMasterPassword { get; set; }
         public RepoConfiguration() { }
-        public RepoConfiguration(string filePath, string rCName, string rCType, string rCHostName, 
+        public RepoConfiguration(string filePath, string rCName, string rCType, string rCEnv, string rCHostName, 
             string rCHostPort, string rCMasterUser, string rCMasterPassword)
         {
             this.filePath = filePath;
             this.RCName = rCName;
             this.RCType = rCType;
+            this.RCEnv = rCEnv;
             this.RCHostServer = rCHostName;
             this.RCHostPort = rCHostPort;
             this.RCMasterUser = rCMasterUser;

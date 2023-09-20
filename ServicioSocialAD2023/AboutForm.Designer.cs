@@ -29,50 +29,54 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AboutForm));
-            lblMainAbout = new Label();
-            btAceptar = new Button();
-            SuspendLayout();
+            this.lblMainAbout = new System.Windows.Forms.Label();
+            this.btAceptar = new System.Windows.Forms.Button();
+            this.SuspendLayout();
             // 
             // lblMainAbout
             // 
-            lblMainAbout.AutoSize = true;
-            lblMainAbout.BackColor = Color.Transparent;
-            lblMainAbout.Location = new Point(12, 23);
-            lblMainAbout.Name = "lblMainAbout";
-            lblMainAbout.Size = new Size(392, 168);
-            lblMainAbout.TabIndex = 0;
-            lblMainAbout.Text = resources.GetString("lblMainAbout.Text");
+            this.lblMainAbout.AutoSize = true;
+            this.lblMainAbout.BackColor = System.Drawing.Color.Transparent;
+            this.lblMainAbout.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.lblMainAbout.Location = new System.Drawing.Point(12, 25);
+            this.lblMainAbout.Name = "lblMainAbout";
+            this.lblMainAbout.Size = new System.Drawing.Size(313, 180);
+            this.lblMainAbout.TabIndex = 0;
+            this.lblMainAbout.Text = resources.GetString("lblMainAbout.Text");
             // 
             // btAceptar
             // 
-            btAceptar.BackColor = Color.MidnightBlue;
-            btAceptar.Location = new Point(436, 213);
-            btAceptar.Name = "btAceptar";
-            btAceptar.Size = new Size(149, 31);
-            btAceptar.TabIndex = 1;
-            btAceptar.Text = "Aceptar";
-            btAceptar.UseVisualStyleBackColor = false;
-            btAceptar.Click += BtnAceptarClick;
+            this.btAceptar.BackColor = System.Drawing.Color.MidnightBlue;
+            this.btAceptar.Location = new System.Drawing.Point(436, 229);
+            this.btAceptar.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btAceptar.Name = "btAceptar";
+            this.btAceptar.Size = new System.Drawing.Size(149, 34);
+            this.btAceptar.TabIndex = 1;
+            this.btAceptar.Text = "Aceptar";
+            this.btAceptar.UseVisualStyleBackColor = false;
+            this.btAceptar.Click += new System.EventHandler(this.btAceptar_Click);
             // 
             // AboutForm
             // 
-            AutoScaleDimensions = new SizeF(7F, 14F);
-            AutoScaleMode = AutoScaleMode.Font;
-            BackColor = Color.Navy;
-            BackgroundImage = Properties.Resources.UANL_SS_BOLETAS_login_background_screen;
-            ClientSize = new Size(597, 255);
-            ControlBox = false;
-            Controls.Add(btAceptar);
-            Controls.Add(lblMainAbout);
-            Font = new Font("Bahnschrift Light", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            ForeColor = Color.White;
-            FormBorderStyle = FormBorderStyle.FixedSingle;
-            Icon = (Icon)resources.GetObject("$this.Icon");
-            Name = "AboutForm";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "Acerca de";
-            ResumeLayout(false);
-            PerformLayout();
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.Navy;
+            this.BackgroundImage = global::uanl_ss_main_ui.Properties.Resources.UANL_SS_BOLETAS_login_background_screen;
+            this.ClientSize = new System.Drawing.Size(597, 274);
+            this.ControlBox = false;
+            this.Controls.Add(this.btAceptar);
+            this.Controls.Add(this.lblMainAbout);
+            this.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.ForeColor = System.Drawing.Color.White;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.Name = "AboutForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Acerca de";
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
         }
 
         #endregion

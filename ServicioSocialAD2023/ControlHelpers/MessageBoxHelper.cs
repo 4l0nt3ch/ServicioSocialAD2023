@@ -10,7 +10,7 @@ namespace uanl_ss_main_ui.ControlHelpers
     {
         public static DialogResult GetErrorMessageBox(string WindowName, string Description, Exception ex)
         {
-            return MessageBox.Show(Description + "ex. " + ex.StackTrace,
+            return MessageBox.Show(Description + " ex. " + ex.Message + " at " + ex.Source + " " + ex.StackTrace,
                 WindowName, 
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
         }

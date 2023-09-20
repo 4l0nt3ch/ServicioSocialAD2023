@@ -45,5 +45,20 @@ namespace uanl_ss_main_ui
             VistaActividad vistaA = new VistaActividad();
             vistaA.ShowDialog();
         }
+
+        private void VistaPrograma_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void BTExit_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void BTConfirm_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

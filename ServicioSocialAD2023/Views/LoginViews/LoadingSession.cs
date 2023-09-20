@@ -8,18 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace uanl_ss_main_ui
+namespace uanl_ss_main_ui.Views.LoginViews
 {
-    public partial class VistaProceso : Form
+    public partial class LoadingSession : Form
     {
-        public VistaProceso()
+        public LoadingSession()
         {
             InitializeComponent();
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-
+            CheckForIllegalCrossThreadCalls = false;
         }
     }
 }

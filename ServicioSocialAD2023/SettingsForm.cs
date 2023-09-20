@@ -13,11 +13,11 @@ using uanl_ss_main_ui.Entities;
 
 namespace uanl_ss_main_ui
 {
-    public partial class VistaConfiguracion : Form
+    public partial class SettingsForm : Form
     {
         private XmlCrud<RepoConfiguration> configRepo;
         private string configRepoPath;
-        public VistaConfiguracion()
+        public SettingsForm()
         {
             InitializeComponent();
             configRepoPath = FileAccessHelper.CreateFileDirectory(
@@ -37,6 +37,7 @@ namespace uanl_ss_main_ui
                     configRepoPath,
                     TXTNombre.Text,
                     SelectServerType(),
+                    CBAmbiente.Text,
                     TBServer.Text,
                     TBPort.Text,
                     TBUser.Text,
@@ -97,6 +98,7 @@ namespace uanl_ss_main_ui
                     configRepoPath,
                     TXTNombre.Text,
                     SelectServerType(),
+                    CBAmbiente.Text,
                     TBServer.Text,
                     TBPort.Text,
                     TBUser.Text,
@@ -137,14 +139,14 @@ namespace uanl_ss_main_ui
 
         private void CBRepoSelectedValueChanged(object sender, EventArgs e)
         {
-            if (CBRepo.SelectedIndex != -1 && CBRepo.SelectedIndex < CBRepo.Items.Count) {
+            if (CBRepo.SelectedIndex > -1) {
                 RepoConfiguration instance = configRepo.GetSelected(CBRepo.SelectedIndex);
 
                 if (instance != null)
                 {
                     SetServerTypeSelected(instance);
                     TXTNombre.Text = instance.RCName;
-                    CBAmbiente.Text = instance.RCType;
+                    CBAmbiente.Text = instance.RCEnv;
                     TBServer.Text = instance.RCHostServer;
                     TBPort.Text = instance.RCHostPort;
                     TBUser.Text = instance.RCMasterUser;
@@ -171,18 +173,19 @@ namespace uanl_ss_main_ui
 
         private void SetServerTypeSelected(RepoConfiguration instance)
         {
-            if (instance.RCType.Equals(RBSharePoint.Text))
+            if (instance.RCType.Equals(RBPhysicalServer.Text))
             {
-                RBSharePoint.Enabled = true;
+                RBSharePoint.Checked = true;
             }
             if (instance.RCType.Equals(RBPhysicalServer.Text))
             {
-                RBPhysicalServer.Enabled = true;
+                RBPhysicalServer.Checked = true;
             }
         }
 
         private void UpdateRepositoryCB() {
             List<RepoConfiguration> list = configRepo.GetAll();
+
             CBRepo.Items.Clear();
 
             foreach (RepoConfiguration item in list) {

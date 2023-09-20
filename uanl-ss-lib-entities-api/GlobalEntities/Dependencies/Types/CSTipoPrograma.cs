@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace uanl_ss_lib_entities_api.GlobalEntities.Dependencies.Types
 {
-    public class CSTipoDepartamento
+    public class CSTipoPrograma
     {
         public string ID { get; set; }
         public string Descripcion { get; set; }
 
-        public CSTipoDepartamento(string iD, string descripcion)
+        public CSTipoPrograma(string iD, string descripcion)
         {
             ID = iD;
             Descripcion = descripcion;
         }
-        public CSTipoDepartamento() { }
+        public CSTipoPrograma() { }
     }
 }

@@ -38,5 +38,7 @@ namespace uanl_ss_lib_office_excel_local_api.MinimalAdapterClass
             CarreaAbrev = carreaAbrev;
             SituacionSS = situacionSS;
         }
+
+
     }
 }

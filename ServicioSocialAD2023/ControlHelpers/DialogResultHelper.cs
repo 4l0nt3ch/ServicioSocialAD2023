@@ -16,55 +16,51 @@ namespace uanl_ss_main_ui.ControlHelpers
         /// <param name="formatFile"></param>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static string OpenFileDialogFlow(string formatFile, string filePath) {
+        public static string OpenFileDialogFlow(string formatFile) {
             try
             {
                 OpenFileDialog fileDialog = new OpenFileDialog();
                 string path = String.Empty;
+                string newPath = String.Empty;
 
                 fileDialog.Title = "Seleccionar archivo";
 
-                if (formatFile == "Excel")
-                {
-                    fileDialog.Filter = "Archivos Excel (*.xlsx)|*.xlsx";
+                switch (formatFile) { 
+                    case "Microsoft Excel":
+                        fileDialog.Filter = "Archivos Excel (*.xls)|*.xls";
+                        break;
+                    case "Microsoft Access":
+                        fileDialog.Filter = "Archivos Excel (*.mdb)|*.mdb";
+                        break;
                 }
 
-                fileDialog.InitialDirectory = filePath;
+                fileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
                 DialogResult result = fileDialog.ShowDialog();
 
                 if (result == DialogResult.OK)
                 {
-                    DialogResult saveFileDialog = MessageBoxHelper.GetQuestionMessageBox("Guardar archivo excel",
-                        "¿Deseas guardar el archivo en el repositorio? No necesitarás de añadir nuevamente el archivo.");
-
-                    if (DialogResult.OK == saveFileDialog)
-                    {
-                        helper = new ConfigurationHelper();
-
-                        string remotePath = helper.RConfigNode("RepositoryPath");
-                        remotePath = Path.Combine(path, "datasets\\");
-                        string fileName = Path.GetFileName(filePath);
-
-                        if (!File.Exists(path))
-                        {
-                            File.Copy(filePath, remotePath);
-                        }
-                        else {
-                            MessageBoxHelper.GetExclamationMessageBox("Operación abortada",
-                                "Este archivo ya existe.");
-                        }
-                    }
 
                     path = fileDialog.FileName;
-                    MessageBoxHelper.GetExclamationMessageBox("Operación correcta", "Archivo seleccionado con éxito.");
+                    newPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+                            , $"UANL Servicio Social\\DataSources\\{formatFile}\\{Path.GetFileName(path)}");
 
-                    return path;
+                    if (!File.Exists(newPath))
+                    {
+                        File.Copy(path, newPath);
+                    }
+                    else
+                    {
+                        MessageBoxHelper.GetExclamationMessageBox("Operación detenida", "El archivo seleccionado ya existe.");
+                    }
+
+                    MessageBoxHelper.GetExclamationMessageBox("Operación correcta", "Archivo seleccionado con éxito.");
+                    return newPath;
                 }
                 else
                 {
                     MessageBoxHelper.GetExclamationMessageBox("Operación errónea", "No indicaste ningún archivo, asegúrate que hayas seleccionado uno, y oprime el botón \"Aceptar\"");
-                    return path;
+                    return newPath;
                 }
             } catch (Exception ex) {
                 MessageBoxHelper.GetErrorMessageBox("Operación fallida", "Se obtuvo un problema con la lectura de la ruta del archivo... ", ex);

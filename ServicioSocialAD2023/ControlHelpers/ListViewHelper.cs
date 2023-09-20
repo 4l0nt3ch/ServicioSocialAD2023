@@ -41,7 +41,7 @@ namespace uanl_ss_main_ui.ControlHelpers
 
             recordList = new List<CSMinExcelRowRecord>();
             repoExcel = new RepositorioExcel(rutaArchivo, hojaCalculo, tbBatch.Text);
-            
+
             recordList = repoExcel.ExcelRecords;
             UpdateListView();
         }
@@ -67,7 +67,33 @@ namespace uanl_ss_main_ui.ControlHelpers
                 listView.Items.Add(item);
             }
 
-            tbPagination.Text = $"{currentPage} de { Math.Ceiling((double) recordList.Count / itemsPerPage) }";
+            tbPagination.Text = $"{currentPage} de {Math.Ceiling((double)recordList.Count / itemsPerPage)}";
+        }
+
+        public List<CSMinExcelRowRecord> ReturnSelRecordsExcel(ListView view) { 
+            
+            List<CSMinExcelRowRecord> selectedRows = new List<CSMinExcelRowRecord>();
+
+            if (view.Items.Count > 0 && view.SelectedItems.Count > 0
+                && recordList != null && recordList.Count > 0) {
+
+                foreach (ListViewItem item in view.SelectedItems)
+                {
+
+                    string valRef = item.SubItems[0].Text;
+
+                    CSMinExcelRowRecord record = recordList.FirstOrDefault(obj => obj.estudiante.Matricula == valRef);
+
+                    if (record != null)
+                    {
+                        selectedRows.Add(record);
+                    }
+
+                }
+            }
+            
+            return selectedRows;
+
         }
 
     }

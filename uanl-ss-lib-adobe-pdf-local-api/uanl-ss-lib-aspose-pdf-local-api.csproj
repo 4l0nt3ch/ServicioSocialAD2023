@@ -2,10 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0-windows</TargetFramework>
-    <RootNamespace>uanl_ss_lib_adobe_pdf_local_api</RootNamespace>
+    <RootNamespace>uanl_ss_lib_aspose_pdf_local_api</RootNamespace>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Engine\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspose.PDF" Version="23.8.0" />
+  </ItemGroup>
 
 </Project>

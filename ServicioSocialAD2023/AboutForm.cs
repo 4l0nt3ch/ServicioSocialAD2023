@@ -17,7 +17,7 @@ namespace uanl_ss_main_ui
             InitializeComponent();
         }
 
-        private void BtnAceptarClick(object sender, EventArgs e)
+        private void btAceptar_Click(object sender, EventArgs e)
         {
             this.Close();
             this.Dispose();

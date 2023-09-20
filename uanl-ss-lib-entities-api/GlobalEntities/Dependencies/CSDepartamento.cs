@@ -11,13 +11,12 @@ namespace uanl_ss_lib_entities_api.GlobalEntities.Dependencies
     {
         public string ID { get; set; }  
         public string Departamento { get; set; }
-        public CSTipoDepartamento TipoDepartamento { get; set; }
+        
         public CSDepartamento() { }
-        public CSDepartamento(string id, string departamento, CSTipoDepartamento tipoDepartamento)
+        public CSDepartamento(string id, string departamento)
         {
             ID = id;
             Departamento = departamento;
-            TipoDepartamento = tipoDepartamento;
         }
     }
 }

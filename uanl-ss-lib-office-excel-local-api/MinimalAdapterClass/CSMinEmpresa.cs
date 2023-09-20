@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using uanl_ss_lib_entities_api.GlobalEntities.Dependencies;
 
 namespace uanl_ss_lib_office_excel_local_api.MinimalAdapterClass
 {

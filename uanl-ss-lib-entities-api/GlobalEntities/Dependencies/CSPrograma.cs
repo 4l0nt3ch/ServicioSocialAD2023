@@ -13,7 +13,9 @@ namespace uanl_ss_lib_entities_api.GlobalEntities.Dependencies
     {
         public string ID { get; set; }
         public CSEmpresa Empresa { get; set; }
+        public CSDepEducativa Dependencia { get; set; }
         public CSDepartamento Departamento { get; set; }
+        public CSTipoPrograma TipoPrograma { get; set; }
         public string Descripcion { get; set; }
         public CSComunidad Comunidad { get; set; }
         public CSResponsable Responsable { get; set; }
@@ -24,12 +26,13 @@ namespace uanl_ss_lib_entities_api.GlobalEntities.Dependencies
         public CSPeriodo Periodo { get; set; }
 
         public CSPrograma () {}
-        public CSPrograma(string id, CSEmpresa empresa, CSDepartamento departamento, string descripcion,
+        public CSPrograma(string id, CSEmpresa empresa, CSDepEducativa dependencia, CSDepartamento departamento, string descripcion,
             CSComunidad comunidad, CSResponsable responsable, CSCoordinador coordinador, 
             CSAlumno alumno, CSTurno turno, CSActividad cSActividad, CSPeriodo periodo)
         {
             ID = id;
             Empresa = empresa;
+            Dependencia = dependencia;
             Departamento = departamento;
             Descripcion = descripcion;
             Comunidad = comunidad;

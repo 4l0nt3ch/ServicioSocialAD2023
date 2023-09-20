@@ -1,6 +1,8 @@
-﻿using System.Runtime.InteropServices;
+﻿using Microsoft.Office.Interop.Word;
+using System;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using uanl_ss_lib_entities_api.GlobalEntities.Dependencies;
-using uanl_ss_lib_office_word_local_api.MinimalAdapterClass;
 using Word = Microsoft.Office.Interop.Word;
 
 namespace uanl_ss_lib_office_word_local_api.Service
@@ -8,17 +10,14 @@ namespace uanl_ss_lib_office_word_local_api.Service
     public class WordService
     {
         private Word.Application WdApplication { get; set; }
-        private string WdExportLocation { get; set; }
-        private string WdExportFilter { get; set; }
         private Word.Document WdDocument {get; set;}
-        private CSPrograma WdPrograma { get; set; }
          
         public WordService() {
             WdApplication = WdInitialize();
         }
 
         public Word.Application WdInitialize() {
-            if (WdApplication.Application == null)
+            if (WdApplication == null)
             {
                 return new Word.Application() { Visible = false };
             }
@@ -27,92 +26,104 @@ namespace uanl_ss_lib_office_word_local_api.Service
             }
         }
 
-        public void MoveCursorToPositionInPoints(Word.Shape currentShape, 
-            float topInches, float leftInches)
+        public Word.Document WdOpenTmplFile(string file, string password)
         {
-            if (WdApplication != null) {
-                float leftPoints = WdApplication.InchesToPoints(leftInches);
-                float topPoints = WdApplication.InchesToPoints(topInches);
+            Assembly asm  = Assembly.GetExecutingAssembly();
 
-                currentShape.Left = leftPoints;
-                currentShape.Top = topPoints;
-            }
-            
-        }
+            string asmLoc = asm.Location;
+            string asmPath = Path.GetDirectoryName(asmLoc);
+            string filePath = Path.Combine(asmPath, file);
 
-        public void WdShutdown() {
-            if (WdApplication != null) {
-                WdApplication.Quit();
-                Marshal.ReleaseComObject(WdApplication);
-                WdApplication = null;
-            }
 
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-        }
+            if (File.Exists(filePath))
+            {
 
-        public Word.Document WdOpenNewFile() {
-            if (WdDocument != null) {
-                while (WdDocument != null)
-                {
-                    WdCloseFile();
-                }
-                WdDocument = WdApplication.Documents.Add();
+                WdDocument = WdApplication.Documents.Open(
+                    filePath, PasswordDocument: password);
+
                 return WdDocument;
             }
             else
             {
-                WdDocument = WdApplication.Documents.Add();
-                return WdDocument;
+                return WdApplication.Documents.Add();
+            }
+                
+        }
+
+        public void WdReplaceTextSingle(Word.Document doc,
+            string oldText,
+            string newText)
+        {
+
+            foreach (Word.Range r in doc.StoryRanges)
+            {
+                string textToSearch = r.Text;
+                int startIndex = textToSearch.IndexOf(oldText);
+
+                if (textToSearch.Contains(oldText)) {
+
+                    int endIndex = startIndex + oldText.Length;
+
+                    string textBefore = textToSearch.Substring(0, startIndex);
+                    string textToReplace = textToSearch.Substring(startIndex, oldText.Length);
+                    string textAfter = textToSearch.Substring(endIndex);
+                    
+                    string newTextReplaced = textBefore + newText + textAfter;
+                    r.Text = newTextReplaced;
+
+                    startIndex = textToSearch.IndexOf(oldText, endIndex);
+                }
             }
         }
 
-        public CSWdTexto WdWriteParagraph(string contenido, float left,
-            float top, float width, float height) {
+        public void WdFindReplaceText(string prevValue, string postValue)
+        {
+            WdDocument.Range().Find.ClearFormatting();
+            WdDocument.Range().Find.Replacement.ClearFormatting();
 
-            return new CSWdTexto(
-                WdDocument,
-                contenido,
-                left,
-                top,
-                width,
-                height
-                );
+            Find find = WdDocument.Range().Find;
+            find.Text = prevValue;
+            find.Replacement.Text = postValue;
+            find.Forward = true;
+            find.Wrap = WdFindWrap.wdFindContinue;
+            find.Format = false;
+            find.MatchCase = false;
+            find.MatchWholeWord = false;
+            find.MatchWildcards = false;
+            find.MatchSoundsLike = false;
+            find.MatchAllWordForms = false;
+
+            find.Execute(Replace: WdReplace.wdReplaceAll);
         }
 
-        public CSWdTabla WdWriteTable(Word.WdTextOrientation orientation, 
-            string family, float fontSize, string[,] textosTabla,
-            float left, float top) {
+        public void WdReplaceTextInTableColumn(string[] newText)
+        {
+            if (WdDocument.Tables.Count >= 1)
+            {
+                Table table = WdDocument.Tables[1];
 
-            return new CSWdTabla(
-                WdDocument,
-                orientation,
-                family,
-                fontSize,
-                textosTabla,
-                left,
-                top
-                );
+                int columnIndex = 2;
+
+                for (int i = 0; i < newText.Length; i++)
+                {
+                    Cell cell = table.Cell(i + 1, columnIndex);
+                    cell.Range.Text = newText[i];
+
+                    Marshal.ReleaseComObject(cell);
+                }
+                Marshal.ReleaseComObject(table);
+            }
         }
 
-        public CSWdImagen WdWriteImage(string contenido, float left,
-            float top, float width, float height) {
-
-            return new CSWdImagen(
-                WdDocument,
-                contenido,
-                left,
-                top,
-                width,
-                height
-                );
-        }
-
-        public void WdSaveFile(string WdInternalFP)
+        public void WdSaveFileAs(string WdInternalFP)
         {
             WdDocument.SaveAs2(
-                Path.Combine(WdExportLocation, WdInternalFP),
-                Word.WdSaveFormat.wdFormatDocument);
+                WdInternalFP, WdSaveFormat.wdFormatDocumentDefault);
+        }
+
+        public void WdSaveFile()
+        {
+            WdDocument.Save();
         }
 
         public void WdCloseFile() {
@@ -124,6 +135,27 @@ namespace uanl_ss_lib_office_word_local_api.Service
 
             GC.Collect();
             GC.WaitForPendingFinalizers();
+        }
+
+        public void WdShutdown()
+        {
+            if (WdApplication != null)
+            {
+                WdApplication.Quit();
+                Marshal.ReleaseComObject(WdApplication);
+                WdApplication = null;
+            }
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+        }
+
+        /* FRAGMENTO RAMA LUIS SANDOVAL WORD TO PDF */
+
+        public void WdConvertToPdf(string outputFilePath)
+        {
+            WdDocument.ExportAsFixedFormat(outputFilePath, WdExportFormat.wdExportFormatPDF);
+            WdCloseFile();
         }
     }
 }

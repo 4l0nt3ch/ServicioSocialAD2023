@@ -4,20 +4,36 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "uanl-ss-main-ui", "ServicioSocialAD2023\uanl-ss-main-ui.csproj", "{ED4BD6EC-EE04-4EB6-9105-81AF032FBE29}"
+	ProjectSection(ProjectDependencies) = postProject
+		{485E0407-FB36-4570-BFED-162C57956197} = {485E0407-FB36-4570-BFED-162C57956197}
+		{6D499F18-63B5-48C5-AEF0-C1EEB0F4CD9D} = {6D499F18-63B5-48C5-AEF0-C1EEB0F4CD9D}
+		{7EBE5D29-2BF3-4D94-A03E-EE617B03BA50} = {7EBE5D29-2BF3-4D94-A03E-EE617B03BA50}
+		{B4BCA695-65F3-419D-A765-28E290487264} = {B4BCA695-65F3-419D-A765-28E290487264}
+		{DC786770-AA83-4DB0-8028-510C80EE7616} = {DC786770-AA83-4DB0-8028-510C80EE7616}
+		{EE787CF8-B62A-4FEB-AF2A-0E19CC627075} = {EE787CF8-B62A-4FEB-AF2A-0E19CC627075}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "uanl-ss-lib-office-excel-local-api", "uanl-ss-lib-office-excel-local-api\uanl-ss-lib-office-excel-local-api.csproj", "{1E16BC95-7211-4C93-979E-3962EEC88F5A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "uanl-ss-lib-office-powerpoint-local-api", "uanl-ss-lib-office-powerpoint-local-api\uanl-ss-lib-office-powerpoint-local-api.csproj", "{FA506529-5833-4CCC-A5B8-9DF63076B8CD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "uanl-ss-lib-office-outlook-local-api", "uanl-ss-lib-office-outlook-local-api\uanl-ss-lib-office-outlook-local-api.csproj", "{DC786770-AA83-4DB0-8028-510C80EE7616}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "uanl-ss-lib-office-word-local-api", "uanl-ss-office-word-local-api\uanl-ss-lib-office-word-local-api.csproj", "{EE787CF8-B62A-4FEB-AF2A-0E19CC627075}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1E16BC95-7211-4C93-979E-3962EEC88F5A} = {1E16BC95-7211-4C93-979E-3962EEC88F5A}
+	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "uanl-ss-lib-adobe-pdf-local-api", "uanl-ss-lib-adobe-pdf-local-api\uanl-ss-lib-adobe-pdf-local-api.csproj", "{7EBE5D29-2BF3-4D94-A03E-EE617B03BA50}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "uanl-ss-lib-aspose-pdf-local-api", "uanl-ss-lib-adobe-pdf-local-api\uanl-ss-lib-aspose-pdf-local-api.csproj", "{7EBE5D29-2BF3-4D94-A03E-EE617B03BA50}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "uanl-ss-lib-entities-api", "uanl-ss-lib-entities-api\uanl-ss-lib-entities-api.csproj", "{485E0407-FB36-4570-BFED-162C57956197}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uanl-ss-lib-xml-local-api", "uanl-ss-lib-xml-local-api\uanl-ss-lib-xml-local-api.csproj", "{1A87C2EF-B158-4C50-9B8A-F077A43B9DD1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "uanl-ss-lib-xml-local-api", "uanl-ss-lib-xml-local-api\uanl-ss-lib-xml-local-api.csproj", "{1A87C2EF-B158-4C50-9B8A-F077A43B9DD1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{485E0407-FB36-4570-BFED-162C57956197} = {485E0407-FB36-4570-BFED-162C57956197}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "uanl-ss-lib-office-access-local-api", "uanl-ss-office-access-local-api\uanl-ss-lib-office-access-local-api.csproj", "{B4BCA695-65F3-419D-A765-28E290487264}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uanl-ss-lib-siase-api", "uanl-ss-lib-siase-api\uanl-ss-lib-siase-api.csproj", "{6D499F18-63B5-48C5-AEF0-C1EEB0F4CD9D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,10 +49,6 @@ Global
 		{1E16BC95-7211-4C93-979E-3962EEC88F5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E16BC95-7211-4C93-979E-3962EEC88F5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E16BC95-7211-4C93-979E-3962EEC88F5A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FA506529-5833-4CCC-A5B8-9DF63076B8CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FA506529-5833-4CCC-A5B8-9DF63076B8CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FA506529-5833-4CCC-A5B8-9DF63076B8CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FA506529-5833-4CCC-A5B8-9DF63076B8CD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DC786770-AA83-4DB0-8028-510C80EE7616}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DC786770-AA83-4DB0-8028-510C80EE7616}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC786770-AA83-4DB0-8028-510C80EE7616}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -57,6 +69,14 @@ Global
 		{1A87C2EF-B158-4C50-9B8A-F077A43B9DD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A87C2EF-B158-4C50-9B8A-F077A43B9DD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A87C2EF-B158-4C50-9B8A-F077A43B9DD1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4BCA695-65F3-419D-A765-28E290487264}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4BCA695-65F3-419D-A765-28E290487264}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4BCA695-65F3-419D-A765-28E290487264}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4BCA695-65F3-419D-A765-28E290487264}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D499F18-63B5-48C5-AEF0-C1EEB0F4CD9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D499F18-63B5-48C5-AEF0-C1EEB0F4CD9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D499F18-63B5-48C5-AEF0-C1EEB0F4CD9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D499F18-63B5-48C5-AEF0-C1EEB0F4CD9D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

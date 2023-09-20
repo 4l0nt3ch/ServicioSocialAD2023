@@ -1,6 +1,6 @@
-﻿using System.Security.AccessControl;
-using System.Xml.Serialization;
-using System.IO;
+﻿using System.Xml.Serialization;
+using System.Xml;
+using System.Formats.Asn1;
 
 namespace uanl_ss_lib_xml_local_api
 {
@@ -8,11 +8,12 @@ namespace uanl_ss_lib_xml_local_api
     {
         private string filePath;
         private List<T> objects;
+        private XmlDocument doc;
 
         public XmlCrud(string filePath)
         {
-            this.filePath = filePath;
-            objects = new List<T>();
+            this.filePath = filePath;         
+            doc = new XmlDocument();
             LoadFromFile();
         }
 
@@ -21,7 +22,7 @@ namespace uanl_ss_lib_xml_local_api
         }
 
         public T GetSelected(int index) { 
-            if (index < 0 || index >= objects.Count)
+            if (index > -1 && index < objects.Count)
             {
                 return objects[index];
             }
@@ -36,7 +37,7 @@ namespace uanl_ss_lib_xml_local_api
         }
 
         public void UpdateObject(T obj, int index) { 
-            if (index >= 0 && index < objects.Count)
+            if (index > -1 && index < objects.Count)
             {
                 objects[index] = obj;
                 SaveToFile();
@@ -45,10 +46,27 @@ namespace uanl_ss_lib_xml_local_api
 
         public void DeleteObject(int index)
         {
-            if (index >= 0 && index < objects.Count)
+            if (index > -1 && index < objects.Count)
             {
                 objects.RemoveAt(index);
                 SaveToFile();
+            }
+        }
+
+        public void CreateFile() {
+
+            if (!File.Exists(filePath))
+            {
+                using (File.Create(filePath)) { }
+            }
+
+            objects = new List<T>();
+
+            XmlSerializer serializer = new XmlSerializer(typeof(List<T>));
+
+            using (StreamWriter writer = new StreamWriter(filePath))
+            {
+                serializer.Serialize(writer, objects);
             }
         }
 
@@ -56,7 +74,7 @@ namespace uanl_ss_lib_xml_local_api
         {
             if (File.Exists(filePath))
             {
-                XmlSerializer serializer = new XmlSerializer(typeof(T));
+                XmlSerializer serializer = new XmlSerializer(typeof(List<T>));
 
                 using (StreamReader reader = new StreamReader(filePath))
                 {
@@ -65,13 +83,17 @@ namespace uanl_ss_lib_xml_local_api
             }
         }
 
-        private void SaveToFile() { 
-            XmlSerializer serializer = new XmlSerializer (typeof(T));
+        private void SaveToFile() {
 
-            using (StreamWriter writer = new StreamWriter(filePath))
+            if (objects != null)
             {
-                serializer.Serialize(writer, objects);
+                XmlSerializer serializer = new XmlSerializer(typeof(List<T>));
+                using (StreamWriter writer = new StreamWriter(filePath))
+                {
+                    serializer.Serialize(writer, objects);
+                }
             }
+
         }
     }
 }

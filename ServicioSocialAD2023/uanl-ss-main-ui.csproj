@@ -12,7 +12,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\uanl-ss-lib-office-excel-local-api\uanl-ss-lib-office-excel-local-api.csproj" />
+    <ProjectReference Include="..\uanl-ss-lib-siase-api\uanl-ss-lib-siase-api.csproj" />
     <ProjectReference Include="..\uanl-ss-lib-xml-local-api\uanl-ss-lib-xml-local-api.csproj" />
+    <ProjectReference Include="..\uanl-ss-office-word-local-api\uanl-ss-lib-office-word-local-api.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,14 +23,14 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Update="VistaActividad.cs">
+    <Compile Update="Views\EntityViews\VistaActividad.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="VistaComunidad.cs">
+    <Compile Update="Views\EntityViews\VistaComunidad.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="VistaTipo.cs" />
-    <Compile Update="VistaResponsable.cs">
+    <Compile Update="Views\EntityViews\VistaTipo.cs" />
+    <Compile Update="Views\EntityViews\VistaResponsable.cs">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>

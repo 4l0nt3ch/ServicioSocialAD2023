@@ -58,7 +58,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="lblMainAbout.Text" xml:space="preserve">
-    <value>UANL Servicio Social (Generador de Documentación Servicio Social v0.1)
+    <value>UANL Servicio Social Desktop v0.2
 
 Universidad Autónoma de Nuevo León
 Facultad de Ingeniería Mecánica y Eléctrica @2023
@@ -67,9 +67,9 @@ Supervisor: M.A. MISSAEL ANTONIO GUEVARA CORREA
 
 Desarrolladores:
 
-FRANCISCO MARTÍN HERNANDEZ MARTÍNEZ 1800313
-LUIS ARMANDO SANDOVAL SILVA 1810369
-GUILLERMO ADRIÁN ALONSO ARÁMBULA 1812367
+Francisco Martín Hernández Martínez 1800313
+Luis Armando Sandoval Silva 1810369
+Guillermo Adrián Alonso Arámbula 1812367
 </value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
