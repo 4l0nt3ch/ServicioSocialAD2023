@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using System.Data.OleDb;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using uanl_ss_lib_office_access_local_api.QueryHelpers;
 
 namespace uanl_ss_lib_office_access_local_api.Repository
@@ -15,197 +13,376 @@ namespace uanl_ss_lib_office_access_local_api.Repository
     {
         private string connStr { get; set; }
         private List<T> listaObjetos { get; set; }
-        private string QueryCreate { get; set; }
-        private string QueryGet { get; set; }
-        private string QueryGetAll { get; set; }
-        private string QueryDelete { get; set; }
-        private string QueryUpdate { get; set; }
+        private COMQueryObject<T> queryObj { get; set; }
 
-        public AccessRepository(string conn, string queryGet, string queryGetAll, string queryCreate,
-            string queryUpdate, string queryDelete)
+        public AccessRepository(string conn, Type t)
         {
             this.connStr = conn;
-            this.QueryGet = queryGet;
-            this.QueryGetAll = queryGetAll;
-            this.QueryCreate = queryCreate;
-            this.QueryUpdate = queryUpdate;
-            this.QueryDelete = queryDelete;
+            queryObj = new COMQueryObject<T>(t);
         }
 
         public void Create(T objeto)
         {
-            using (OleDbConnection conn = new OleDbConnection(connStr))
+            try
             {
-                conn.Open();
+                using (OleDbConnection conn = new OleDbConnection(connStr))
+                {
+                    conn.Open();
 
-                Type type = typeof(T);
+                    Type type = typeof(T);
+                    string queryIn = queryObj.CreateTable();
 
-                PropertyInfo[] props = type.GetProperties();
+                    PropertyInfo[] props = type.GetProperties();
 
-                string tableName = type.Name;
-                string columnNames = string.Join(", ", props.Select(p => p.Name));
-                string columnValues = string.Join(", ", props.Select(p => "@" + p.Name));
+                    string columnNames = string.Join(", ", props.Select(p => p.Name));
+                    string columnValues = string.Join(", ", props.Select(p => "@" + p.Name));
 
-                using (OleDbCommand cmd = new OleDbCommand(QueryCreate, conn)) { 
-                    
-                    foreach (var prop in props)
+                    queryIn.Replace("=columns", columnNames);
+                    queryIn.Replace("=values", columnValues);
+
+                    using (OleDbCommand cmd = new OleDbCommand(queryIn, conn))
                     {
-                        cmd.Parameters.AddWithValue("@" + prop.Name, prop.GetValue(objeto));  
+
+                        foreach (var prop in props)
+                        {
+                            cmd.Parameters.AddWithValue("@" + prop.Name, prop.GetValue(objeto));
+                        }
+
+                        cmd.ExecuteNonQuery();
+                        System.Diagnostics.Debug.WriteLine($"Registro creado con éxito");
+
                     }
 
-                    cmd.ExecuteNonQuery();
-                    System.Diagnostics.Debug.WriteLine("Registro creado con éxito");
-
+                    conn.Close();
                 }
-
-                conn.Close();
             }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
+                return;
+            }
+            
         }
 
-        public List<T> ReadAll(int id)
+        public void SetForeignKey()
         {
-            if (listaObjetos == null)
+            try
             {
-                listaObjetos = new List<T>();
-            }
-            else
-            {
-                listaObjetos.Clear();
-            }
-
-            using (OleDbConnection conn = new OleDbConnection(connStr))
-            {
-                conn.Open();
-
-                Type type = typeof(T);
-                PropertyInfo[] props = type.GetProperties();
-
-                string tableName = type.Name;
-
-                using (OleDbCommand cmd = new OleDbCommand(QueryGetAll, conn))
+                using (OleDbConnection conn = new OleDbConnection(connStr))
                 {
-                    using (OleDbDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            T obj = Activator.CreateInstance<T>();
 
-                            foreach (var prop in props)
+                    conn.Open();
+
+                    Type type = typeof(T);
+                    PropertyInfo[] props = type.GetProperties();
+
+                    foreach (var prop in props)
+                    {
+                        string queryIn = queryObj.CreateFK();
+                        string typeMeta = COMQueryHelpers.GetAccessColumnType(prop.PropertyType);
+
+                        if (Type.GetTypeCode(type) == TypeCode.Object && typeMeta == "VARCHAR(255)")
+                        {
+                            queryIn.Replace("=reftable", prop.PropertyType.Name);
+                            queryIn.Replace("=refcolname", prop.Name);
+                            queryIn.Replace("=exttable", prop.PropertyType.Name);
+                            queryIn.Replace("=extcolumn", "ID");
+
+                            using (OleDbCommand cmd = new OleDbCommand(queryIn, conn))
                             {
-                                if (prop.Name != "id")
-                                {
-                                    prop.SetValue(obj, reader[prop.Name] != DBNull.Value ? reader[prop.Name] : null);
-                                }
+                                cmd.ExecuteNonQuery();
+                                System.Diagnostics.Debug.WriteLine($"Llave foránea definida con éxito");
                             }
 
-                            listaObjetos.Add(obj);  
                         }
                     }
 
+                    conn.Close();
+
+                }
+            } catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
+                return;
+            }
+           
+
+        }
+
+        public List<T> ReadAll()
+        {
+            try
+            {
+                if (listaObjetos == null)
+                {
+                    listaObjetos = new List<T>();
+                }
+                else
+                {
+                    listaObjetos.Clear();
                 }
 
-                conn.Close();
+                using (OleDbConnection conn = new OleDbConnection(connStr))
+                {
+                    conn.Open();
+
+                    Type type = typeof(T);
+                    PropertyInfo[] props = type.GetProperties();
+
+                    using (OleDbCommand cmd = new OleDbCommand(queryObj.GetAll(), conn))
+                    {
+                        using (OleDbDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                T obj = Activator.CreateInstance<T>();
+
+                                foreach (var prop in props)
+                                {
+                                    if (prop.Name != "ID")
+                                    {
+                                        prop.SetValue(obj, reader[prop.Name] != DBNull.Value ? reader[prop.Name] : null);
+                                    }
+                                }
+
+                                listaObjetos.Add(obj);
+                            }
+                        }
+
+                        System.Diagnostics.Debug.WriteLine($"Registros actualizados con éxito");
+                    }
+
+                    conn.Close();
+                }
+
+                return listaObjetos;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
+                return default(List<T>);
+            }
+            
+        }
+
+        public List<T> ReadFilter(string columnName, object ColumnValue)
+        {
+            try
+            {
+                using (OleDbConnection conn = new OleDbConnection(connStr))
+                {
+                    conn.Open();
+
+                    Type type = typeof(T);
+                    PropertyInfo[] props = type.GetProperties();
+
+                    string queryIn = queryObj.GetFiltered(columnName);
+
+                    using (OleDbCommand cmd = new OleDbCommand(queryIn, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@ColumnValue", ColumnValue);
+
+                        using (OleDbDataReader reader = cmd.ExecuteReader())
+                        {
+                            List<T> result = new List<T>();
+
+                            while (reader.Read())
+                            {
+                                T obj = Activator.CreateInstance<T>();
+
+                                foreach (var prop in props)
+                                {
+                                    if (prop.Name != columnName)
+                                    {
+                                        prop.SetValue(obj, reader[prop.Name] != DBNull.Value ? reader[prop.Name] : null);
+                                    }
+                                }
+
+                                result.Add(obj);
+                            }
+
+                            if (result.Count > 0)
+                            {
+                                System.Diagnostics.Debug.WriteLine($"Registros leídos con éxito: {result.Count}");
+                                return result;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
             }
 
-            return listaObjetos;
+            return new List<T>(); // Devuelve una lista vacía si no se encuentran registros o si hay errores.
         }
 
         public T Read(int id)
         {
-            using (OleDbConnection conn = new OleDbConnection(connStr))
+            try
             {
-                conn.Open();
-
-                Type type = typeof(T);
-                PropertyInfo[] props = type.GetProperties();
-
-                string tableName = type.Name;
-
-                using (OleDbCommand cmd = new OleDbCommand(QueryGet, conn))
+                using (OleDbConnection conn = new OleDbConnection(connStr))
                 {
-                    cmd.Parameters.AddWithValue("@Id", id);
+                    conn.Open();
+                    string queryIn = queryObj.Get();
 
-                    using (OleDbDataReader reader = cmd.ExecuteReader())
+                    Type type = typeof(T);
+                    PropertyInfo[] props = type.GetProperties();
+
+                    using (OleDbCommand cmd = new OleDbCommand(queryIn, conn))
                     {
+                        cmd.Parameters.AddWithValue("@ID", id);
 
-                        if (reader.Read())
+                        using (OleDbDataReader reader = cmd.ExecuteReader())
                         {
-                            T obj = Activator.CreateInstance<T>();
 
-                            foreach (var prop in props)
+                            if (reader.Read())
                             {
-                                if (prop.Name != "Id")
+                                T obj = Activator.CreateInstance<T>();
+
+                                foreach (var prop in props)
                                 {
-                                    prop.SetValue(obj, reader[prop.Name] != DBNull.Value ? reader[prop.Name] : null);
+                                    if (prop.Name != "ID")
+                                    {
+                                        prop.SetValue(obj, reader[prop.Name] != DBNull.Value ? reader[prop.Name] : null);
+                                    }
                                 }
+
+                                return obj;
                             }
 
-                            return obj;
+                            System.Diagnostics.Debug.WriteLine($"Registro leido con éxito");
                         }
-
                     }
+                    conn.Close();
                 }
-                conn.Close();
+                return default(T);
             }
-            return default(T);
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
+                return default(T);
+            }
+            
         }
 
         public void Update(T objetoActualizado)
         {
-            using (OleDbConnection conn = new OleDbConnection(connStr)) {
-                
-                conn.Open();
-
-                Type type = typeof(T);
-                PropertyInfo[] props = type.GetProperties();
-
-                string tableName = type.Name;
-                string queryUpdate = QueryUpdate;
-                
-                foreach (var prop in props)
+            try
+            {
+                using (OleDbConnection conn = new OleDbConnection(connStr))
                 {
-                    queryUpdate += $"{prop.Name} = @{prop.Name}, ";
-                }
 
-                queryUpdate = queryUpdate.TrimEnd(',', ' ');
-                queryUpdate += " WHERE Id = @Id";
+                    conn.Open();
 
-                using (OleDbCommand cmd = new OleDbCommand(queryUpdate,conn))
-                {
-                    foreach ( var prop in props)
+                    Type type = typeof(T);
+                    PropertyInfo[] props = type.GetProperties();
+
+                    string queryIn = queryObj.Update();
+
+                    foreach (var prop in props)
                     {
-                        cmd.Parameters.AddWithValue("@" + prop.Name, prop.GetValue(objetoActualizado));
+                        queryIn += $"{prop.Name} = @{prop.Name}, ";
                     }
 
-                    cmd.ExecuteNonQuery();
-                    System.Diagnostics.Debug.WriteLine("Registro actualizado con éxito");
+                    queryIn = queryIn.TrimEnd(',', ' ');
+                    queryIn += " WHERE ID = @ID;";
 
+                    using (OleDbCommand cmd = new OleDbCommand(queryIn, conn))
+                    {
+                        foreach (var prop in props)
+                        {
+                            cmd.Parameters.AddWithValue("@" + prop.Name, prop.GetValue(objetoActualizado));
+                        }
+
+                        cmd.ExecuteNonQuery();
+                        System.Diagnostics.Debug.WriteLine($"Registro actualizado con éxito");
+
+                    }
+
+                    conn.Close();
                 }
-
-                conn.Close();
             }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
+                return;
+            }
+            
         }
 
         public void Delete(int id)
         {
-            using (OleDbConnection conn = new OleDbConnection(connStr))
+            try
             {
-                conn.Open();
-
-                Type type = typeof(T);
-                string tableName = type.Name;
-
-                using (OleDbCommand cmd = new OleDbCommand(QueryDelete, conn))
+                using (OleDbConnection conn = new OleDbConnection(connStr))
                 {
+                    conn.Open();
+                    string queryIn = queryObj.Delete();
 
-                    cmd.Parameters.AddWithValue("@Id", id);
-                    cmd.ExecuteNonQuery();
-                    System.Diagnostics.Debug.WriteLine("Registro actualizado con éxito");
+                    Type type = typeof(T);
+                    string tableName = type.Name;
 
+                    using (OleDbCommand cmd = new OleDbCommand(queryIn, conn))
+                    {
+
+                        cmd.Parameters.AddWithValue("@ID", id);
+                        cmd.ExecuteNonQuery();
+                        System.Diagnostics.Debug.WriteLine($"Registro eliminado con éxito");
+
+                    }
+
+                    conn.Close();
                 }
-
-                conn.Close();
             }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
+                return;
+            }
+            
+        }
+
+        public void CreateTable()
+        {
+            try
+            {
+                using (OleDbConnection conn = new OleDbConnection(connStr))
+                {
+                    conn.Open();
+                    string queryIn = queryObj.CreateTable();
+
+                    Type type = typeof(T);
+                    PropertyInfo[] props = type.GetProperties();
+
+                    foreach (var prop in props)
+                    {
+                        string columnName = prop.Name;
+                        string columnType = COMQueryHelpers.GetAccessColumnType(prop.PropertyType);
+
+                        queryIn += $"{columnName} {columnType}, ";
+                    }
+
+                    queryIn = queryIn.TrimEnd(',', ' ');
+                    queryIn += ");";
+
+                    using (OleDbCommand cmd = new OleDbCommand(queryIn, conn))
+                    {
+
+                        cmd.ExecuteNonQuery();
+                        System.Diagnostics.Debug.WriteLine($"Tabla creada con éxito.");
+                    }
+
+                    conn.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
+                return;
+            }
+            
         }
     }
 }

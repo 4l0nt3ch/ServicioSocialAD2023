@@ -3,6 +3,7 @@ using System.Drawing.Printing;
 using System.IO;
 using uanl_ss_lib_entities_api.GlobalEntities.Dependencies;
 using uanl_ss_lib_office_excel_local_api.MinimalAdapterClass;
+using uanl_ss_lib_office_excel_local_api.Repositories;
 using uanl_ss_main_ui.ControlHelpers;
 using uanl_ss_main_ui.Views.DataSourceViews;
 
@@ -10,17 +11,22 @@ namespace uanl_ss_main_ui
 {
     public partial class MainForm : Form
     {
-        private ListViewHelper lvHelper { get; set; }   
+        private ListViewHelper lvHelper { get; set; }
+        private static List<CSPrograma> selProgramas { get; set; }
         private string fileLocation { get; set; }
         private ConfigurationHelper configHelper { get; set; }
         private FileSystemWatcher watcher { get; set; }
         private string DAdirectory { get; set; }
+        private static string DAFile { get; set; }
+        private VistaProgreso prog { get; set; }
+        private static string ExportFilter { get; set; }
         public MainForm()
         {
             InitializeComponent();
             ResizeMainScreen();
-            
+
             DAdirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "UANL Servicio Social\\DataSources\\");
+            selProgramas = new List<CSPrograma>();
 
             watcher = new FileSystemWatcher();
             watcher.Path = DAdirectory;
@@ -37,7 +43,8 @@ namespace uanl_ss_main_ui
 
             CheckForIllegalCrossThreadCalls = false;
 
-            if (configHelper.GetConfiguration().AppSettings.Settings == null) {
+            if (configHelper.GetConfiguration().AppSettings.Settings == null)
+            {
                 BuildConfiguration();
             }
         }
@@ -57,110 +64,145 @@ namespace uanl_ss_main_ui
             InfoPanel.Width = RegisterPanel.Width;
         }
 
-        private void DivPanelInfoClick(object sender, EventArgs e)
-        {
-            AboutForm form = new AboutForm();
-            form.ShowDialog();
-        }
-
-        private void BTPCEvent(object sender, EventArgs e)
-        {
-            VistaPrograma vistaP = new VistaPrograma();
-            vistaP.ShowDialog();
-        }
-
-        private void BTCCreate(object sender, EventArgs e)
-        {
-            VistaCoordinador vista = new VistaCoordinador();
-            vista.ShowDialog();
-        }
-
-        private void BTARClick(object sender, EventArgs e)
-        {
-            VistaResponsable vistaR = new VistaResponsable();
-            vistaR.ShowDialog();
-        }
-
-        private void BTAPClick(object sender, EventArgs e)
-        {
-            VistaPeriodo vistaP = new VistaPeriodo();
-            vistaP.ShowDialog();
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label23_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void panel1_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void ConfigurationClock(object sender, EventArgs e)
-        {
-            SettingsForm vistaC = new SettingsForm();
-            vistaC.ShowDialog();
-        }
-
 
         #region Lectura y Modificación de Configuración
-        private void BuildConfiguration() {
+        private void BuildConfiguration()
+        {
 
-            
+
 
         }
         #endregion
 
         private void ListViewUpdateEvent(object sender, EventArgs e)
         {
-            string tool = CbImportTool.Text;
-
-            switch (tool)
+            if (LVFormatRepoList.Items != null &&
+                LVFormatRepoList.SelectedItems != null &&
+                LVFormatRepoList.SelectedItems.Count > 0)
             {
-                case "Microsoft Excel":
-                    ListViewUpdateExcel();
-                    break;
-                case "Microsoft Access":
-                    /* PENDIENTE DE DESARROLLAR */
-                    break;
-                default:
-                    MessageBoxHelper.GetQuestionMessageBox("Operación fallida", "Indique la tecnología de lectura de la fuente de datos.");
-                    break;
+                string tool = CbImportTool.Text;
+                DialogResult res = MessageBox.Show($"Ruta: " + Path.Combine(DAdirectory, tool,
+                            LVFormatRepoList.SelectedItems[0].Text) + $"\nMotor de importación: {tool}\nMotor de exportación: {CBExportEngine.Text}\n¿Desea Continuar?", "Confirmar operación",
+                            MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                if (res == DialogResult.Yes)
+                {
+                    switch (tool)
+                    {
+                        case "Microsoft Excel":
+                            ListViewUpdateExcel();
+                            break;
+                        case "Microsoft Access":
+                            //PENDIENTE DE IMPLEMENTAR
+                            break;
+                        default:
+                            MessageBoxHelper.GetQuestionMessageBox("Operación fallida", "Indique la tecnología de lectura de la fuente de datos.");
+                            break;
+                    }
+                }
+                else
+                {
+                    MessageBoxHelper.GetExclamationMessageBox("Operación abortada", "Debes de seleccionar un archivo para actualizar la lista de programas del servicio social.");
+                }
             }
         }
 
-        private void ListViewUpdateExcel() {
+        private void listView1_DrawSubItem(object sender, DrawListViewSubItemEventArgs e)
+        {
+            e.DrawDefault = true; // Deja que el sistema dibuje el subitem de manera predeterminada
 
-            MessageBoxHelper.GetExclamationMessageBox("Ruta", Path.Combine(DAdirectory,"Microsoft Excel", LVFormatRepoList.SelectedItems[0].Text));
-
-            if (LVFormatRepoList.SelectedItems != null &&
-                File.Exists(Path.Combine(DAdirectory,"Microsoft Excel",LVFormatRepoList.SelectedItems[0].Text)))
+            if (e.ColumnIndex > 0) // Solo personaliza subitems después del primer subitem (índice 0)
             {
+                string subItemText = e.SubItem.Text;
 
-                lvHelper = new ListViewHelper(
-                    LVMain,
-                    btNextPag,
-                    btPrevPag,
-                    TBPagination,
-                    TBBatchAmmount,
-                    Int32.Parse(TBBatchAmmount.Text),
-                    Path.Combine(DAdirectory,"Microsoft Excel",LVFormatRepoList.SelectedItems[0].Text),
-                    "ssc_mis_estudiantes_ss_00 (8)");
+                // Personaliza el color de fondo según el texto del subitem
+                if (subItemText == "Liberado")
+                {
+                    e.SubItem.BackColor = Color.DarkOliveGreen;
+                }
+                else if (subItemText == "Registrado")
+                {
+                    e.SubItem.BackColor = Color.DarkSlateGray;
+                }
+                else if (subItemText == "Error")
+                {
+                    e.SubItem.BackColor = Color.Maroon;
+                }
+
+                e.SubItem.ForeColor = Color.White;
             }
-            else {
-                MessageBoxHelper.GetExclamationMessageBox("Error de operación", "Indique los siguientes datos para poder mostrar los registros, Tecnología a utilizar y archivo correspondiente.");
+        }
+
+        private void listView1_DrawColumnHeader(object sender, DrawListViewColumnHeaderEventArgs e)
+        {
+            e.DrawDefault = true; // Deja que el sistema dibuje los encabezados de columna de manera predeterminada
+        }
+
+        private void ListViewUpdateExcel()
+        {
+            try
+            {
+                if (LVFormatRepoList.SelectedItems.Count > 0)
+                {
+                    DAFile = LVFormatRepoList.SelectedItems[0].Text;
+                }
+
+                if (LVFormatRepoList.SelectedItems != null &&
+                File.Exists(Path.Combine(DAdirectory, "Microsoft Excel", DAFile)))
+                {
+                    if (CBExportEngine.Text.Equals("Microsoft Word"))
+                    {
+                        lvHelper = new ListViewHelper(
+                        LVMain,
+                        btNextPag,
+                        btPrevPag,
+                        TBPagination,
+                        TBBatchAmmount,
+                        Int32.Parse(TBBatchAmmount.Text),
+                        Path.Combine(DAdirectory, "Microsoft Excel", LVFormatRepoList.SelectedItems[0].Text),
+                        "ssc_mis_estudiantes_ss_00 (8)",
+                        "docx");
+                    }
+                    else if (CBExportEngine.Text.Equals("Aspose PDF"))
+                    {
+                        lvHelper = new ListViewHelper(
+                        LVMain,
+                        btNextPag,
+                        btPrevPag,
+                        TBPagination,
+                        TBBatchAmmount,
+                        Int32.Parse(TBBatchAmmount.Text),
+                        Path.Combine(DAdirectory, "Microsoft Excel", LVFormatRepoList.SelectedItems[0].Text),
+                        "ssc_mis_estudiantes_ss_00 (8)",
+                        "pdf");
+                    }
+
+                    ListViewRefreshDetails();
+
+                }
+                else
+                {
+                    MessageBoxHelper.GetExclamationMessageBox("Error de operación", "Indique los siguientes datos para poder mostrar los registros, Tecnología a utilizar y archivo correspondiente.");
+                }
             }
+            catch (Exception ex)
+            {
+                MessageBoxHelper.GetExclamationMessageBox("Error de operación", "La selección del DataSource ha sido perdida. " + ex.Message);
+            }
+
+        }
+
+        private void ListViewRefreshDetails()
+        {
+            FileAccessHelper.GetRecordsProcessed(lvHelper.pagProg, TBFoundRecords, TBExportedRecords, TBUnexportedRecords, TBErrorFiles, CBExportEngine);
+            FileAccessHelper.UpdateFileAmmount(TBFoundFiles);
+            FileAccessHelper.UpdateFileAmmount(TBCorrectFiles);
         }
 
         private void ButtonImportFileEvent(object sender, EventArgs e)
         {
-            if (CbImportTool.SelectedIndex > -1) {
+            if (CbImportTool.SelectedIndex > -1)
+            {
 
                 string tool = CbImportTool.Text;
 
@@ -190,7 +232,7 @@ namespace uanl_ss_main_ui
             {
                 CreateDSView createDS = new CreateDSView(CbImportTool.Text);
                 createDS.ShowDialog();
-            }   
+            }
             else
             {
                 MessageBoxHelper.GetExclamationMessageBox("Programa no indicado", "Seleccione un programa para la importación de datos deseada e intente de nuevo.");
@@ -218,7 +260,8 @@ namespace uanl_ss_main_ui
                         MessageBoxHelper.GetExclamationMessageBox("Operación omitida", "El archivo no existe.");
                     }
                 }
-                else { 
+                else
+                {
                     MessageBoxHelper.GetExclamationMessageBox("Operación omitida", "No indicaste ningún archivo a eliminar.");
                 }
             }
@@ -246,7 +289,8 @@ namespace uanl_ss_main_ui
             {
                 TBBatchAmmount.Text = (Int32.Parse(TBBatchAmmount.Text.ToString()) - 1).ToString();
             }
-            else {
+            else
+            {
                 MessageBoxHelper.GetExclamationMessageBox("Operación no valida", "Ya no se puede reducir el lote deseado a menos de 0 registros.");
             }
         }
@@ -258,20 +302,27 @@ namespace uanl_ss_main_ui
                 if (lvHelper.currentPage > 1)
                 {
                     lvHelper.currentPage--;
-                    lvHelper.UpdateListView();
+                    lvHelper.UpdateListView("Excel", null, null, null);
+
+                    ListViewRefreshDetails();
                 }
             }
-            else {
+            else
+            {
                 MessageBoxHelper.GetExclamationMessageBox("Operación fallida", "Actualice la lista solicitada para poder navegar en ella.");
             }
         }
 
         private void BtnPagSiguienteClick(object sender, EventArgs e)
         {
-            if (lvHelper != null) { 
-                if (lvHelper.currentPage < (int) Math.Ceiling((double)lvHelper.recordList.Count / lvHelper.itemsPerPage)) {
+            if (lvHelper != null)
+            {
+                if (lvHelper.currentPage < (int)Math.Ceiling((double)lvHelper.recordList.Count / lvHelper.itemsPerPage))
+                {
                     lvHelper.currentPage++;
-                    lvHelper.UpdateListView();
+                    lvHelper.UpdateListView("Excel", null, null, null);
+
+                    ListViewRefreshDetails();
                 }
             }
         }
@@ -300,7 +351,7 @@ namespace uanl_ss_main_ui
             LVFormatRepoList.Items.Clear();
 
             string selectedProgram = CbImportTool.SelectedItem.ToString();
-            string directory =  Path.Combine(DAdirectory, selectedProgram);
+            string directory = Path.Combine(DAdirectory, selectedProgram);
 
             if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
 
@@ -366,22 +417,35 @@ namespace uanl_ss_main_ui
         #region GenerateDocs
         private void BtGenerateDocs(object sender, EventArgs e)
         {
-            List<CSPrograma> selProgramas = new List<CSPrograma>();
-
-            if (CbImportTool.SelectedIndex > -1 && 
+            if (CbImportTool.SelectedIndex > -1 &&
                 CBExportEngine.SelectedIndex > -1 &&
                 CBTemplateEngine.SelectedIndex > -1 &&
                 LVMain.Items != null &&
-                LVMain.SelectedItems != null && 
+                LVMain.SelectedItems != null &&
                 LVMain.SelectedItems.Count > 0)
             {
 
-                switch (CbImportTool.Text) {
-                      
+                if (CBExportFilter.Text != null && CBExportFilter.Text != string.Empty)
+                {
+                    ExportFilter = CBExportFilter.Text;
+                }
+                else
+                {
+                    ExportFilter = "default";
+                }
+
+                switch (CbImportTool.Text)
+                {
+
                     case "Microsoft Excel":
+
                         List<CSMinExcelRowRecord> selRecords = lvHelper.ReturnSelRecordsExcel(LVMain);
                         selProgramas = CSExcelRowToGlobalClass.ProgramaExcelToObj(selRecords, null, null, null);
-                        VistaProgreso prog = new VistaProgreso(selProgramas, CBExportEngine.Text, CBTemplateEngine.Text);
+
+                        prog = new VistaProgreso(selProgramas, CBExportEngine.Text, CBTemplateEngine.Text, ExportFilter);
+                        lvHelper.UpdateListView("Excel", null, null, null);
+
+                        ListViewRefreshDetails();
                         break;
 
                     case "Microsoft Access":
@@ -389,9 +453,9 @@ namespace uanl_ss_main_ui
                         /* PENDIENTE DE DESARROLLAR */
                         break;
                 }
-                
             }
-            else {
+            else
+            {
                 MessageBoxHelper.GetExclamationMessageBox("Operación detenida", "Seleccione una herramienta de exportación para poder generar los documentos.");
             }
         }
@@ -407,7 +471,8 @@ namespace uanl_ss_main_ui
 
         private void CBAccessPassword_CheckedChanged(object sender, EventArgs e)
         {
-            if (CBAccessPassword.Checked) {
+            if (CBAccessPassword.Checked)
+            {
                 TBPassword.Enabled = true;
                 TBPasswordConfirm.Enabled = true;
             }
@@ -432,12 +497,20 @@ namespace uanl_ss_main_ui
 
         private void RBOnlyFolder_CheckedChanged(object sender, EventArgs e)
         {
-            if (RBOnlyFolder.Checked) { CBExportFilter.Enabled = false; }
+            if (RBOnlyFolder.Checked)
+            {
+                CBExportFilter.Text = string.Empty;
+                CBExportFilter.Enabled = false;
+            }
         }
 
         private void RBSeparatedFolders_CheckedChanged(object sender, EventArgs e)
         {
-            if (RBSeparatedFolders.Checked) { CBExportFilter.Enabled = true; }
+            if (RBSeparatedFolders.Checked)
+            {
+                CBExportFilter.Text = "default";
+                CBExportFilter.Enabled = true;
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -451,6 +524,11 @@ namespace uanl_ss_main_ui
         private void panel2_Paint(object sender, PaintEventArgs e)
         {
 
+        }
+
+        private void BtnMinimizeClicked(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Minimized;
         }
     }
 }

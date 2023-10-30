@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using uanl_ss_lib_entities_api.GlobalEntities.Dependencies;
+﻿using uanl_ss_lib_entities_api.GlobalEntities.Dependencies;
 using uanl_ss_lib_entities_api.GlobalEntities.Dependencies.Types;
 using uanl_ss_lib_entities_api.GlobalEntities.Roles;
 using uanl_ss_lib_entities_api.GlobalEntities.Roles.Types;
 using uanl_ss_lib_entities_api.GlobalEntities.Misc;
 using SH = uanl_ss_lib_office_excel_local_api.Helpers.StringHelpers;
+using uanl_ss_lib_office_excel_local_api.Helpers;
 
 namespace uanl_ss_lib_office_excel_local_api.MinimalAdapterClass
 {
@@ -105,11 +101,12 @@ namespace uanl_ss_lib_office_excel_local_api.MinimalAdapterClass
 
             string[] respData = SH.SHValidateAndDivideExcelString(record.programa.Responsable);
 
-            return new CSResponsable(
+            if (respData != null && respData != Array.Empty<string>()) {
+                return new CSResponsable(
                 SH.SHValidateExcelString(string.Empty),
                 SH.SHValidateExcelString(respData[1].ToUpper()),
                 SH.SHValidateExcelString(respData[2].ToUpper()),
-                SH.SHValidateExcelString(string.Join(" ",respData[3..respData.Length].Select(s => s.ToUpper()))),
+                SH.SHValidateExcelString(string.Join(" ", respData[3..respData.Length].Select(s => s.ToUpper()))),
                 SH.SHValidateExcelString(string.Empty),
                 SH.SHValidateExcelString(string.Empty),
                 SH.SHValidateExcelString(string.Empty),
@@ -117,14 +114,41 @@ namespace uanl_ss_lib_office_excel_local_api.MinimalAdapterClass
                 new CSCarrera(
                     SH.SHValidateExcelString(string.Empty),
                     new CSTipoCarrera(
-                        0,
+                        SH.SHValidateExcelString(string.Empty),
                         SH.SHValidateExcelString(string.Empty)),
                     SH.SHValidateExcelString(respData[0].ToUpper())),
                 SH.SHValidateExcelString("ACTIVO"),
                 SH.SHValidateExcelString("default"),
                 SH.SHValidateExcelString("root"),
-                Array.Empty<byte>()
+                string.Empty,
+                string.Empty
                 );
+            }
+
+            else {
+                return new CSResponsable(
+                SH.SHValidateExcelString(string.Empty),
+                SH.SHValidateExcelString("MISSAEL ANTONIO"),
+                SH.SHValidateExcelString("GUEVARA"),
+                SH.SHValidateExcelString("CORREA"),
+                SH.SHValidateExcelString(string.Empty),
+                SH.SHValidateExcelString(string.Empty),
+                SH.SHValidateExcelString(string.Empty),
+                SH.SHValidateExcelString(string.Empty),
+                new CSCarrera(
+                    SH.SHValidateExcelString(string.Empty),
+                    new CSTipoCarrera(
+                        SH.SHValidateExcelString(string.Empty),
+                        SH.SHValidateExcelString(string.Empty)),
+                    SH.SHValidateExcelString("M.A.")),
+                SH.SHValidateExcelString("ACTIVO"),
+                SH.SHValidateExcelString("default"),
+                SH.SHValidateExcelString("root"),
+                ImageHelpers.ConvertImageToBase64("Firma MAGC.png"),
+                ImageHelpers.ConvertImageToBase64("Sello MAGC.jpg")
+                );
+
+            }
         }
 
         /*
@@ -146,14 +170,14 @@ namespace uanl_ss_lib_office_excel_local_api.MinimalAdapterClass
                 new CSCarrera(
                     SH.SHValidateExcelString(string.Empty),
                     new CSTipoCarrera(
-                        0,
+                        SH.SHValidateExcelString(string.Empty),
                         SH.SHValidateExcelString(string.Empty)),
                     SH.SHValidateExcelString("M.A.")),
                 SH.SHValidateExcelString("ACTIVO"),
                 SH.SHValidateExcelString(string.Empty),
                 SH.SHValidateExcelString(string.Empty),
-                Array.Empty<byte>(),
-                Array.Empty<byte>()
+                ImageHelpers.ConvertImageToBase64("Firma MAGC.png"),
+                ImageHelpers.ConvertImageToBase64("Sello MAGC.jpg")
                 );
             }
             else {
@@ -178,7 +202,7 @@ namespace uanl_ss_lib_office_excel_local_api.MinimalAdapterClass
                 new CSCarrera(
                     SH.SHValidateExcelString(record.estudiante.Carrera),
                     new CSTipoCarrera(
-                        0,
+                        SH.SHValidateExcelString(string.Empty),
                         SH.SHValidateExcelString(record.estudiante.NivelAcademico)),
                     SH.SHValidateExcelString(record.estudiante.CarreaAbrev)),
                 SH.SHValidateExcelString(record.estudiante.SituacionSS),
@@ -212,7 +236,7 @@ namespace uanl_ss_lib_office_excel_local_api.MinimalAdapterClass
                 Random rd = new Random();
 
                 return new CSPeriodo(
-                    0,
+                    SH.SHValidateExcelString(string.Empty),
                     SH.SHValidateExcelString("ENERO - JUNIO 2021"),
                     new DateOnly(2020, 12, 1),
                     new DateOnly(2021, 5, 31),

@@ -11,13 +11,14 @@ namespace uanl_ss_lib_entities_api.GlobalEntities.Roles
         public string Estatus { get; set; }
         public string Usuario { get; set; }
         public string Contraseña { get; set; }
-        public byte[] FirmaResponsable { get; set; }
+        public string FirmaResponsable { get; set; }
+        public string SelloResponsable { get; set; }
 
         public CSResponsable() : base() { }
         
         public CSResponsable(string id, string nombre, string apellidoPaterno, string apellidoMaterno,
             string emailUANL, string emailPersonal, string telefono, string nivelAcademico,
-            CSCarrera carrera, string estatus, string usuario, string contraseña, byte[] firmaResponsable)
+            CSCarrera carrera, string estatus, string usuario, string contraseña, string firmaResponsable, string selloResponsable)
             : base (id, nombre,apellidoPaterno, apellidoMaterno, emailUANL, emailPersonal, telefono, nivelAcademico, carrera)
         {
             ID = id;
@@ -33,6 +34,7 @@ namespace uanl_ss_lib_entities_api.GlobalEntities.Roles
             Usuario = usuario;
             Contraseña = contraseña;
             FirmaResponsable = firmaResponsable;
+            SelloResponsable = selloResponsable;
         }
     }
 }

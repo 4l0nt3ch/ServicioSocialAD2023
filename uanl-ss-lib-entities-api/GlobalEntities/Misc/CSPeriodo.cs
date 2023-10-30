@@ -8,14 +8,14 @@ namespace uanl_ss_lib_entities_api.GlobalEntities.Misc
 {
     public class CSPeriodo
     {
-        public int ID {  get; set; }
+        public string ID {  get; set; }
         public string Descripcion { get; set; }
         public DateOnly FechaInicio { get; set; }
         public DateOnly FechaFin { get; set; }
         public DateTime FechaAceptacion { get; set; }
         public DateTime[] FechaEvaluaciones { get; set; }
         public CSPeriodo() { }
-        public CSPeriodo(int iD, string descripcion, DateOnly fechaInicio, DateOnly fechaFin,
+        public CSPeriodo(string iD, string descripcion, DateOnly fechaInicio, DateOnly fechaFin,
             DateTime fechaAceptacion, DateTime[] fechaEvaluaciones)
         {
             ID = iD;

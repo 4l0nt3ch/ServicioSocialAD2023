@@ -56,12 +56,19 @@ namespace uanl_ss_lib_office_excel_local_api.Helpers
 
         public static string[] SHValidateAndDivideExcelString(string cadena)
         {
-            string[] values = new string[] { GetAcronym(cadena) };
-            string[] values2 = FullName(cadena).Split(" ");
+            if (cadena != null && cadena != string.Empty)
+            {
+                string[] values = new string[] { GetAcronym(cadena) };
+                string[] values2 = FullName(cadena).Split(" ");
 
-            values = values.Concat(values2).ToArray(); 
+                values = values.Concat(values2).ToArray();
 
-            return values;
+                return values;
+            }
+            else
+            {
+                return Array.Empty<string>();
+            }
         }
 
 

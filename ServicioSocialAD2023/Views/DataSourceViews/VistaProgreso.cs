@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using uanl_ss_lib_entities_api.GlobalEntities.Dependencies;
+﻿using uanl_ss_lib_entities_api.GlobalEntities.Dependencies;
 using uanl_ss_main_ui.ControlHelpers;
 
 namespace uanl_ss_main_ui
@@ -19,25 +9,26 @@ namespace uanl_ss_main_ui
         CancellationTokenSource CTSource { get; set; }
         private string ExportTool { get; set; }
         private string Template { get; set; }
-        public VistaProgreso(List<CSPrograma> listProgramas, string ExportTool, string Template)
+        private string arrangeType { get; set; }    
+        public VistaProgreso(List<CSPrograma> listProgramas, string ExportTool, string Template, string arrangeType)
         {
             InitializeComponent();
             this.ExportTool = ExportTool;
             this.Template = Template;
-            LSProgramas = listProgramas; 
+            this.LSProgramas = listProgramas;
+            this.arrangeType = arrangeType;
             CheckForIllegalCrossThreadCalls = false;
-            Show();
+            ShowDialog();
         }
 
         private void ButtonCancelClicked(object sender, EventArgs e)
         {
             if (CTSource != null) {
                 CTSource.Cancel();
-                Dispose();
             }
         }
 
-        private async void VistaProgresoLoad(object sender, EventArgs e)
+        private void VistaProgresoLoad(object sender, EventArgs e)
         {
             try
             {
@@ -67,14 +58,10 @@ namespace uanl_ss_main_ui
             switch (Template)
             {
                 case "Boleta de Presentación":               
-                    await TaskHelper.GenerateBPTask(this, LSProgramas, CTSource);                 
+                    await TaskHelper.GenerateBPTask(this, LSProgramas, CTSource, arrangeType);
                     break;
                 case "Carta de Inicio":
-                    await TaskHelper.GenerateCITask(this, LSProgramas, CTSource);
-                    break;
-                case "Carta de Finalización":
-                    break;
-                case "Evaluación":
+                    await TaskHelper.GenerateCITask(this, LSProgramas, CTSource, arrangeType);
                     break;
                 case "Kardex":
                     break;
@@ -85,15 +72,12 @@ namespace uanl_ss_main_ui
 
         private async void PDFExportTool()
         {
+            CTSource = new CancellationTokenSource();
             switch (Template)
             {
                 case "Boleta de Presentación":
                     break;
                 case "Carta de Inicio":
-                    break;
-                case "Carta de Finalización":
-                    break;
-                case "Evaluación":
                     break;
                 case "Kardex":
                     break;

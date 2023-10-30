@@ -5,6 +5,7 @@ using uanl_ss_lib_entities_api.GlobalEntities.Dependencies;
 using System.Reflection;
 using System.Globalization;
 using System;
+using uanl_ss_lib_office_word_local_api.Helpers;
 
 namespace uanl_ss_lib_office_word_local_api.Engine
 {
@@ -14,7 +15,7 @@ namespace uanl_ss_lib_office_word_local_api.Engine
 
         public MotorCP() {}
 
-        public void CreateTemplateCI(CSPrograma programa)
+        public void WdCreateTemplateCI(CSPrograma programa, string fileLocation)
         {
             try
             {
@@ -22,17 +23,11 @@ namespace uanl_ss_lib_office_word_local_api.Engine
 
                 Document doc = service.WdOpenTmplFile("Carta de Inicio V1.docx", "AD2023");
 
-                if (!Directory.Exists(
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                    $"UANL Servicio Social\\Archives\\AD2023\\CISS\\")
-                    )) {
-                    Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                    $"UANL Servicio Social\\Archives\\AD2023\\CISS\\"));         
+                if (!Directory.Exists(Path.GetDirectoryName(fileLocation))) {
+                    Directory.CreateDirectory(Path.GetDirectoryName(fileLocation));         
                 }
 
-                string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                    $"UANL Servicio Social\\Archives\\AD2023\\CISS\\{programa.Alumno.Matricula}_{programa.Alumno.Nombre}" +
-                    $"_{programa.Alumno.ApellidoPaterno}_{programa.Alumno.ApellidoMaterno}.docx");
+                string filePath = Path.Combine(fileLocation);
 
                 service.WdSaveFileAs(filePath);
 
@@ -65,6 +60,25 @@ namespace uanl_ss_lib_office_word_local_api.Engine
                     $"{programa.Dependencia.DENombre}"
                     );
 
+                ImageHelper.imageShape(
+                    "Firma",
+                    doc,
+                    Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Firma MAGC.png"),
+                    50f,
+                    5f,
+                    (0.69f * 72f),
+                    (0.78f * 72f)
+                    );
+
+                ImageHelper.imageShape(
+                    "Sello",
+                    doc,
+                    Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Sello MAGC.jpg"),
+                    0f,
+                    0f,
+                    (1.40f * 72f),
+                    (2.18f * 72f)
+                    );
 
                 service.WdSaveFile();
                 service.WdCloseFile();
@@ -79,26 +93,19 @@ namespace uanl_ss_lib_office_word_local_api.Engine
             }
         } 
 
-        public void CreateTemplateBP(CSPrograma programa) {
+        public void WdCreateTemplateBP(CSPrograma programa, string fileLocation) {
             try
             {
                 service = new WordService();
 
                 Document doc = service.WdOpenTmplFile("Boleta de Presentación V1.docx", "ad2023");
 
-                if (!Directory.Exists(
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                    $"UANL Servicio Social\\Archives\\AD2023\\BPSS\\")
-                    ))
+                if (!Directory.Exists(Path.GetDirectoryName(fileLocation)))
                 {
-                    Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                    $"UANL Servicio Social\\Archives\\AD2023\\BPSS\\"));
+                    Directory.CreateDirectory(Path.GetDirectoryName(fileLocation));
                 }
 
-                string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                    $"UANL Servicio Social\\Archives\\AD2023\\BPSS\\{programa.Alumno.Matricula}_{programa.Alumno.Nombre}" +
-                    $"_{programa.Alumno.ApellidoPaterno}_{programa.Alumno.ApellidoMaterno}.docx");
-
+                string filePath = Path.Combine(fileLocation);
 
                 service.WdSaveFileAs(filePath);
                 service.WdReplaceTextSingle(doc, "00/00/00, 00:00",
@@ -130,6 +137,26 @@ namespace uanl_ss_lib_office_word_local_api.Engine
 
                 service.WdFindReplaceText("=DATETIME",
                     formattedMonth);
+
+                ImageHelper.imageShape(
+                    "FirmaAceptado",
+                    doc,
+                    Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Firma MAGC.png"),
+                    50f,
+                    20f,
+                    (0.78f * 72f),
+                    (0.90f * 72f)
+                    );
+
+                ImageHelper.imageShape(
+                    "Sello",
+                    doc,
+                    Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Sello MAGC.jpg"),
+                    70f,
+                    50f,
+                    (1.40f * 72f),
+                    (2.18f * 72f)
+                    );
 
                 service.WdSaveFile();
                 service.WdCloseFile();

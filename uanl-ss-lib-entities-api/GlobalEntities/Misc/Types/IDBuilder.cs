@@ -3,48 +3,67 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using uanl_ss_lib_entities_api.GlobalEntities.Dependencies;
 
 namespace uanl_ss_lib_entities_api.GlobalEntities.Misc.Types
 {
-    public class IDBuilder
+    public class IDBuilder<T>
     {
-        public static string RetornarIDAlumno(int id) {
-            return "AL" + id;
-        }
-
-        public static string RetornarIDCoordinador(int id) {
-            return "COR" + id;        
-        }
-
-        public static string RetornarIDResponsable(int id) {
-            return "RES" + id;
-        }
-
-        public static string RetornarIDPrograma(int id) {
-            return "PRG" + id;
-        }
-
-        public static string RetornarTipoEmpresa(int id) {
-            return "TYPE" + id;
-        }
-
-        public static string RetornarTipoAE(int id)
+        public string BuildID(int numId)
         {
-            return "TYPA" + id;
-        }
+            string IDstr = string.Empty;  
+            
+            Type type = typeof(T);
 
-        public static string RetornarIDEmpresa(int id)
-        {
-            return "EMP" + id;
-        }
+            switch (type.GetType().Name)
+            {
+                case "CSEmpresa":
+                    IDstr = $"EMP{numId}";
+                    break;
+                case "CSTipoEmpresa":
+                    IDstr = $"TYE{numId}";
+                    break;
+                case "CSTipoAE":
+                    IDstr = $"AEC{numId}";
+                    break;
+                case "CSDepEducativa":
+                    IDstr = $"DPE{numId}";
+                    break;
+                case "CSDepartamento":
+                    IDstr = $"DEP{numId}";
+                    break;
+                case "CSTipoPrograma":
+                    IDstr = $"TYP{numId}";
+                    break;
+                case "CSComunidad":
+                    IDstr = $"COM{numId}";
+                    break;
+                case "CSResponsable":
+                    IDstr = $"RSP{numId}";
+                    break;
+                case "CSCoordinador":
+                    IDstr = $"CRD{numId}";
+                    break;
+                case "CSAlumno":
+                    IDstr = $"ALM{numId}";
+                    break;
+                case "CSTurno":
+                    IDstr = $"TRN{numId}";
+                    break;
+                case "CSActividad":
+                    IDstr = $"ACT{numId}";
+                    break;
+                case "CSPeriodo":
+                    IDstr = $"PRD{numId}";
+                    break;
+                case "CSCarrera":
+                    IDstr = $"CAR{numId}";
+                    break;
+            }
 
-        public static string RetornarIDDepartamento(int id) {
-            return "DEP" + id;
-        }
+            return IDstr;
 
-        public static string RetornarIDPeriodo(int id)
-        {
-            return "PER" + id;
         }
+       
     }
 }

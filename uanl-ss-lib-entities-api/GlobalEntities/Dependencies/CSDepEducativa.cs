@@ -8,7 +8,7 @@ namespace uanl_ss_lib_entities_api.GlobalEntities.Dependencies
 {
     public class CSDepEducativa
     {
-        public string DEID { get; set; }
+        public string ID { get; set; }
         public string DENombre { get; set; }
         public string DENivelEducativo { get; set; }
         public string DEDireccion { get; set; }
@@ -17,7 +17,7 @@ namespace uanl_ss_lib_entities_api.GlobalEntities.Dependencies
         public CSDepEducativa() { } 
 
         public CSDepEducativa(string deId, string deNombre, string deNivelEducativo, string direccion, string deSiglas) {
-            DEID = deId;
+            ID = deId;
             DENombre = deNombre;
             DENivelEducativo = deNivelEducativo;
             DEDireccion = direccion;

@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Printing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using uanl_ss_lib_office_excel_local_api;
+﻿using uanl_ss_lib_entities_api.GlobalEntities.Dependencies;
+using uanl_ss_lib_entities_api.GlobalEntities.Misc;
+using uanl_ss_lib_entities_api.GlobalEntities.Roles;
 using uanl_ss_lib_office_excel_local_api.MinimalAdapterClass;
 using uanl_ss_lib_office_excel_local_api.Repositories;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 
 namespace uanl_ss_main_ui.ControlHelpers
 {
@@ -22,12 +18,14 @@ namespace uanl_ss_main_ui.ControlHelpers
         public int currentPage { get; set; }
         public string rutaArchivo { get; set; }
         public string hojaCalculo { get; set; }
+        public string format { get; set; }
         private RepositorioExcel repoExcel { get; set; }
         public List<CSMinExcelRowRecord> recordList { get; set; }
         public List<CSMinExcelRowRecord> paginatedList { get; set; }
+        public List<CSPrograma> pagProg { get; set; }
 
         public ListViewHelper(ListView view, Button btnSiguiente, Button btnAtras, TextBox tbPagination, TextBox tbBatch,
-            int itemsPerPage, string rutaArchivo, string hojaCalculo)
+            int itemsPerPage, string rutaArchivo, string hojaCalculo, string format)
         {
             this.listView = view;
             this.btnSiguiente = btnSiguiente;
@@ -38,32 +36,58 @@ namespace uanl_ss_main_ui.ControlHelpers
             this.currentPage = 1;
             this.rutaArchivo = rutaArchivo;
             this.hojaCalculo = hojaCalculo;
+            this.format = format;
 
             recordList = new List<CSMinExcelRowRecord>();
             repoExcel = new RepositorioExcel(rutaArchivo, hojaCalculo, tbBatch.Text);
 
             recordList = repoExcel.ExcelRecords;
-            UpdateListView();
+            UpdateListView("Excel",null,null,null);
         }
 
-        public void UpdateListView() {
+        public void UpdateListView(string? sourceTool, CSDepEducativa? CSed, CSCoordinador? CSCoord, CSPeriodo? CSPer) {
             int startIndex = (currentPage - 1) * itemsPerPage;
             int endIndex = Math.Min(startIndex + itemsPerPage, recordList.Count);
 
             paginatedList = recordList.GetRange(startIndex, endIndex - startIndex);
-
             listView.Items.Clear();
 
-            foreach (CSMinExcelRowRecord obj in paginatedList) {
-                ListViewItem item = new ListViewItem(obj.estudiante.Matricula);
-                item.SubItems.Add(obj.estudiante.Nombre);
-                item.SubItems.Add(obj.estudiante.APaterno);
-                item.SubItems.Add(obj.estudiante.AMaterno);
-                item.SubItems.Add(obj.estudiante.CarreaAbrev);
-                item.SubItems.Add(obj.empresa.RazonSocial);
-                item.SubItems.Add(obj.empresa.TpActEcono);
-                item.SubItems.Add(obj.programa.Descripcion);
-                item.SubItems.Add(obj.programa.Deparatmento);
+            pagProg = null;
+
+            if (sourceTool == null || sourceTool == "Excel")
+            {
+                pagProg = CSExcelRowToGlobalClass.ProgramaExcelToObj(paginatedList,CSed,CSCoord,CSPer);
+            }
+            else if (sourceTool == "Access")
+            {
+                pagProg = null;
+            }
+            
+            foreach (CSPrograma obj in pagProg) {
+                ListViewItem item = new ListViewItem(obj.Alumno.Matricula);
+                item.SubItems.Add(
+                    FileAccessHelper.CheckFileExistence(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                    "UANL Servicio Social", "Archives" , "BPSS")
+                    , obj, format
+                    ));
+                item.SubItems.Add(
+                    FileAccessHelper.CheckFileExistence(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                    "UANL Servicio Social", "Archives", "CISS")
+                    , obj, format
+                    ));
+                item.SubItems.Add(
+                    FileAccessHelper.CheckFileExistence(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                    "UANL Servicio Social","Archives", "KRD")
+                    , obj, format
+                    ));
+                item.SubItems.Add(obj.Alumno.Nombre);
+                item.SubItems.Add(obj.Alumno.ApellidoPaterno);
+                item.SubItems.Add(obj.Alumno.ApellidoMaterno);
+                item.SubItems.Add(obj.Alumno.Carrera.Abreviacion);
+                item.SubItems.Add(obj.Empresa.RazonSocial);
+                item.SubItems.Add(obj.Empresa.ActividadEconomica.Descripcion);
+                item.SubItems.Add(obj.Descripcion);
+                item.SubItems.Add(obj.Departamento.Departamento);
                 listView.Items.Add(item);
             }
 

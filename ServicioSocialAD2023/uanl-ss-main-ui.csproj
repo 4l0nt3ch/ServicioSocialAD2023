@@ -11,6 +11,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Firma MAGC.png" />
+    <None Remove="Sello MAGC.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Firma MAGC.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sello MAGC.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\uanl-ss-lib-office-excel-local-api\uanl-ss-lib-office-excel-local-api.csproj" />
     <ProjectReference Include="..\uanl-ss-lib-siase-api\uanl-ss-lib-siase-api.csproj" />
     <ProjectReference Include="..\uanl-ss-lib-xml-local-api\uanl-ss-lib-xml-local-api.csproj" />
