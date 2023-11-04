@@ -21,7 +21,7 @@ namespace uanl_ss_lib_office_word_local_api.Engine
             {
                 service = new WordService();
 
-                Document doc = service.WdOpenTmplFile("Carta de Inicio V1.docx", "AD2023");
+                Document doc = service.WdOpenTmplFile("Carta de Inicio V1.docx", String.Empty);
 
                 if (!Directory.Exists(Path.GetDirectoryName(fileLocation))) {
                     Directory.CreateDirectory(Path.GetDirectoryName(fileLocation));         
@@ -98,7 +98,7 @@ namespace uanl_ss_lib_office_word_local_api.Engine
             {
                 service = new WordService();
 
-                Document doc = service.WdOpenTmplFile("Boleta de Presentación V1.docx", "ad2023");
+                Document doc = service.WdOpenTmplFile("Boleta de Presentación V1.docx", String.Empty);
 
                 if (!Directory.Exists(Path.GetDirectoryName(fileLocation)))
                 {
